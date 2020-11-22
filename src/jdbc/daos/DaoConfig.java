@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import jdbc.models.PlaylistCreator;
+import jdbc.models.PlaylistListener;
 
 public class DaoConfig {
 
@@ -49,6 +50,11 @@ public class DaoConfig {
       e.printStackTrace();
     }
   }
+
+  // --------------------------------------------------------------------------------
+  // Playlist creator classes
+  // --------------------------------------------------------------------------------
+
 
   static final String FIND_ALL_PLAYLISTCREATORS
       = "SELECT * FROM playlist_creator";
@@ -153,7 +159,6 @@ public class DaoConfig {
   }
 
 
-
   static final String DELETE_CREATOR =
       "DELETE FROM playlist_creator WHERE id=?";
   public void deleteCreator(Integer creatorId) {
@@ -169,10 +174,137 @@ public class DaoConfig {
     }
   }
 
+  // --------------------------------------------------------------------------------
+  // Playlist listener classes
+  // --------------------------------------------------------------------------------
+
+
+  static final String FIND_ALL_PLAYLISTLISTENERS
+      = "SELECT * FROM playlist_listener";
+
+  public List<PlaylistListener> findAllListeners() {
+    List<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
+    connection = getConnection();
+    try {
+      statement = connection
+          .prepareStatement(FIND_ALL_PLAYLISTLISTENERS);
+      ResultSet resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        Integer id = resultSet.getInt("id");
+        String listenerUsername = resultSet.getString("username");
+        PlaylistListener listListener = new PlaylistListener(id, listenerUsername);
+        listeners.add(listListener);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        connection.close();
+        statement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+    return listeners;
+  }
+
+  static final String UPDATE_PLAYLISTLISTENER=
+      "UPDATE playlist_listener SET username=? WHERE id=?";
+
+  public Integer updateListener(Integer listenerId, PlaylistCreator listener) {
+    connection = getConnection();
+    try {
+      statement = connection.prepareStatement(UPDATE_PLAYLISTLISTENER);
+      statement.setString(1, listener.getUsername());
+      statement.setInt(2, listener.getId());
+      status = statement.executeUpdate();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        connection.close();
+        statement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+    return status;
+  }
+
+  static final String FIND_LISTENER_BY_ID =
+      "SELECT * FROM playlist_listener WHERE id=?";
+  public PlaylistListener findListenerById(Integer listenerId) {
+    connection = getConnection();
+    try {
+      statement = connection.prepareStatement(FIND_LISTENER_BY_ID);
+      statement.setInt(1, listenerId);
+      ResultSet resultSet = statement.executeQuery();
+      if (resultSet.next()) {
+        String username = resultSet.getString("username");
+        PlaylistListener listener = new PlaylistListener(listenerId, username);
+        return listener;
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        connection.close();
+        statement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+    return null;
+  }
+
+  static final String CREATE_PLAYLISTLISTENER
+      = "INSERT INTO playlist_listener VALUES (?,?)";
+  public Integer createPlaylistListener(PlaylistListener listener) {
+    status = -1;
+    connection = getConnection();
+    try {
+      statement = connection
+          .prepareStatement(CREATE_PLAYLISTLISTENER);
+      statement.setInt(1, listener.getId());
+      statement.setString(2, listener.getUsername());
+      status = statement.executeUpdate();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        connection.close();
+        statement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+    return status;
+  }
+
+
+  static final String DELETE_LISTENER=
+      "DELETE FROM playlist_creator WHERE id=?";
+  public void deleteListener(Integer listenerId) {
+    String sql = "delete from playlist_listener where id=?";
+    try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+      stmt.setInt(1, listenerId);
+      stmt.executeUpdate();
+      System.out.println("Record deleted successfully");
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
 
 
 
-    public static void main(String[] args) {
+
+
+
+
+
+  public static void main(String[] args) {
     DaoConfig dao = new DaoConfig();
     List<PlaylistCreator> creators = dao.findAllCreators();
     for (PlaylistCreator c : creators) {
@@ -190,14 +322,14 @@ public class DaoConfig {
       creator = dao.findCreatorById(578);
       System.out.println(creator);
 
-  /*    creator = new PlaylistCreator(460, "tobedeleted");
+      creator = new PlaylistCreator(710, "tobedeleted");
       Integer stat = dao.createPlaylistCreator(creator);
       System.out.println(stat);
 
       creator = dao.findCreatorById(410);
       System.out.println(creator);
-*/
-      dao.deleteCreator(460);
+
+      dao.deleteCreator(710);
     }
 
 }
