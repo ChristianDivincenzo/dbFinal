@@ -38,19 +38,21 @@ public class DaoConfig {
     return connection;
   }
 
-  public static void closeConnection() {
+ public static void closeConnection() {
     try {
-      if (connection != null) {
+      if(connection != null) {
         connection.close();
+        connection = null;
       }
-      if (statement != null) {
+      if(statement != null) {
         statement.close();
+        statement = null;
       }
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
-
+  
   // --------------------------------------------------------------------------------
   // Playlist creator classes
   // --------------------------------------------------------------------------------
@@ -75,12 +77,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return creators;
   }
@@ -98,12 +95,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return status;
   }
@@ -124,12 +116,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return null;
   }
@@ -148,12 +135,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return status;
   }
@@ -198,12 +180,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return listeners;
   }
@@ -221,12 +198,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return status;
   }
@@ -247,12 +219,7 @@ public class DaoConfig {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      closeConnection();
     }
     return null;
   }
@@ -270,13 +237,8 @@ public class DaoConfig {
       status = statement.executeUpdate();
     } catch (SQLException e) {
       e.printStackTrace();
-    } finally {
-      try {
-        connection.close();
-        statement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+   } finally {
+      closeConnection();
     }
     return status;
   }
